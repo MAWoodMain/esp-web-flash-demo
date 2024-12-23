@@ -13,7 +13,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          path: working-directory
+          path: ${{ github.event.repository.name }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -23,11 +23,11 @@ jobs:
       - name: Setup Zephyr project
         uses: zephyrproject-rtos/action-zephyr-setup@v1
         with:
-          app-path: app
+          app-path: ${{ github.event.repository.name }}
           toolchains: xtensa-espressif_esp32s3_zephyr-elf
 
       - name: Build firmware
-        working-directory: working-directory
+        working-directory: ${{ github.event.repository.name }}
         shell: bash
         run: |
           pwd
@@ -44,4 +44,4 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           name: zephyr.bin
-          path: working-directory/esp-web-flash-demo/build/zephyr/zephyr.bin
+          path: ${{ github.event.repository.name }}/build/zephyr/zephyr.bin
