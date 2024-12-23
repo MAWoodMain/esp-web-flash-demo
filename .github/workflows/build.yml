@@ -38,4 +38,5 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: 'esp-web-flash-demo/build/zephyr/zephyr.bin'
+          name: zephyr.bin
+          path: esp-web-flash-demo/esp-web-flash-demo/build/zephyr/zephyr.bin
