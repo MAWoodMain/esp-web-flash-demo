@@ -11,6 +11,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-22.04
+    needs: build
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -18,11 +19,16 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 18
+      - name: Download binary file
+        uses: actions/download-artifact@v4
+        with:
+          name: zephyr.bin
       - name: Build example project and copy docs
         run: |
           cd flasher
           npm install
           npm run build
+          cp ../zephyr.bin ./dist/
       - name: Setup Pages
         uses: actions/configure-pages@v4
       - name: Upload artifact
