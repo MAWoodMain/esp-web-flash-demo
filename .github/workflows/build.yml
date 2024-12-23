@@ -17,7 +17,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          path: example-application
+          path: esp-web-flash-demo
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -37,7 +37,7 @@ jobs:
           west build -p always -b heltec_wireless_stick_lite_v3/esp32s3/procpu app
 
       - name: Twister Tests
-        working-directory: example-application
+        working-directory: esp-web-flash-demo
         shell: bash
         run: |
           if [ "${{ runner.os }}" = "Windows" ]; then
