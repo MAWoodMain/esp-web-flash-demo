@@ -1,40 +1,20 @@
-const baudrates = document.getElementById("baudrates") as HTMLSelectElement;
-const consoleBaudrates = document.getElementById("consoleBaudrates") as HTMLSelectElement;
 const connectButton = document.getElementById("connectButton") as HTMLButtonElement;
-const traceButton = document.getElementById("copyTraceButton") as HTMLButtonElement;
 const disconnectButton = document.getElementById("disconnectButton") as HTMLButtonElement;
 const resetButton = document.getElementById("resetButton") as HTMLButtonElement;
-const consoleStartButton = document.getElementById("consoleStartButton") as HTMLButtonElement;
-const consoleStopButton = document.getElementById("consoleStopButton") as HTMLButtonElement;
 const eraseButton = document.getElementById("eraseButton") as HTMLButtonElement;
-const addFileButton = document.getElementById("addFile") as HTMLButtonElement;
 const programButton = document.getElementById("programButton");
-const filesDiv = document.getElementById("files");
-const terminal = document.getElementById("terminal");
-const programDiv = document.getElementById("program");
-const consoleDiv = document.getElementById("console");
-const lblBaudrate = document.getElementById("lblBaudrate");
-const lblConsoleBaudrate = document.getElementById("lblConsoleBaudrate");
-const lblConsoleFor = document.getElementById("lblConsoleFor");
 const lblConnTo = document.getElementById("lblConnTo");
 const table = document.getElementById("fileTable") as HTMLTableElement;
 const alertDiv = document.getElementById("alertDiv");
 
 const debugLogging = document.getElementById("debugLogging") as HTMLInputElement;
 
-// This is a frontend example of Esptool-JS using local bundle file
-// To optimize use a CDN hosted version like
-// https://unpkg.com/esptool-js@0.5.0/bundle.js
 import { ESPLoader, FlashOptions, LoaderOptions, Transport } from "esptool-js";
 import { serial } from "web-serial-polyfill";
 
 const serialLib = !navigator.serial && navigator.usb ? serial : navigator.serial;
 
-declare let Terminal; // Terminal is imported in HTML script
 declare let CryptoJS; // CryptoJS is imported in HTML script
-
-const term = new Terminal({ cols: 120, rows: 40 });
-term.open(terminal);
 
 let device = null;
 let transport: Transport;
@@ -42,11 +22,8 @@ let chip: string = null;
 let esploader: ESPLoader;
 
 disconnectButton.style.display = "none";
-traceButton.style.display = "none";
 eraseButton.style.display = "none";
-consoleStopButton.style.display = "none";
 resetButton.style.display = "none";
-filesDiv.style.display = "none";
 
 /**
  * The built in Event object.
@@ -72,18 +49,6 @@ function handleFileSelect(evt) {
   reader.readAsBinaryString(file);
 }
 
-const espLoaderTerminal = {
-  clean() {
-    term.clear();
-  },
-  writeLine(data) {
-    term.writeln(data);
-  },
-  write(data) {
-    term.write(data);
-  },
-};
-
 connectButton.onclick = async () => {
   if (device === null) {
     device = await serialLib.requestPort({});
@@ -93,8 +58,7 @@ connectButton.onclick = async () => {
   try {
     const flashOptions = {
       transport,
-      baudrate: parseInt(baudrates.value),
-      terminal: espLoaderTerminal,
+      baudrate: 115200, /* todo check */
       debugLogging: debugLogging.checked,
     } as LoaderOptions;
     esploader = new ESPLoader(flashOptions);
@@ -105,26 +69,14 @@ connectButton.onclick = async () => {
     // await esploader.flashId();
   } catch (e) {
     console.error(e);
-    term.writeln(`Error: ${e.message}`);
   }
 
   console.log("Settings done for :" + chip);
-  lblBaudrate.style.display = "none";
   lblConnTo.innerHTML = "Connected to device: " + chip;
   lblConnTo.style.display = "block";
-  baudrates.style.display = "none";
   connectButton.style.display = "none";
   disconnectButton.style.display = "initial";
-  traceButton.style.display = "initial";
   eraseButton.style.display = "initial";
-  filesDiv.style.display = "initial";
-  consoleDiv.style.display = "none";
-};
-
-traceButton.onclick = async () => {
-  if (transport) {
-    transport.returnTrace();
-  }
 };
 
 resetButton.onclick = async () => {
@@ -141,53 +93,8 @@ eraseButton.onclick = async () => {
     await esploader.eraseFlash();
   } catch (e) {
     console.error(e);
-    term.writeln(`Error: ${e.message}`);
   } finally {
     eraseButton.disabled = false;
-  }
-};
-
-addFileButton.onclick = () => {
-  const rowCount = table.rows.length;
-  const row = table.insertRow(rowCount);
-
-  //Column 1 - Offset
-  const cell1 = row.insertCell(0);
-  const element1 = document.createElement("input");
-  element1.type = "text";
-  element1.id = "offset" + rowCount;
-  element1.value = "0x1000";
-  cell1.appendChild(element1);
-
-  // Column 2 - File selector
-  const cell2 = row.insertCell(1);
-  const element2 = document.createElement("input");
-  element2.type = "file";
-  element2.id = "selectFile" + rowCount;
-  element2.name = "selected_File" + rowCount;
-  element2.addEventListener("change", handleFileSelect, false);
-  cell2.appendChild(element2);
-
-  // Column 3  - Progress
-  const cell3 = row.insertCell(2);
-  cell3.classList.add("progress-cell");
-  cell3.style.display = "none";
-  cell3.innerHTML = `<progress value="0" max="100"></progress>`;
-
-  // Column 4  - Remove File
-  const cell4 = row.insertCell(3);
-  cell4.classList.add("action-cell");
-  if (rowCount > 1) {
-    const element4 = document.createElement("input");
-    element4.type = "button";
-    const btnName = "button" + rowCount;
-    element4.name = btnName;
-    element4.setAttribute("class", "btn");
-    element4.setAttribute("value", "Remove"); // or element1.value = "button";
-    element4.onclick = function () {
-      removeRow(row);
-    };
-    cell4.appendChild(element4);
   }
 };
 
@@ -218,64 +125,11 @@ function cleanUp() {
 disconnectButton.onclick = async () => {
   if (transport) await transport.disconnect();
 
-  term.reset();
-  lblBaudrate.style.display = "initial";
-  baudrates.style.display = "initial";
-  consoleBaudrates.style.display = "initial";
   connectButton.style.display = "initial";
   disconnectButton.style.display = "none";
-  traceButton.style.display = "none";
   eraseButton.style.display = "none";
   lblConnTo.style.display = "none";
-  filesDiv.style.display = "none";
   alertDiv.style.display = "none";
-  consoleDiv.style.display = "initial";
-  cleanUp();
-};
-
-let isConsoleClosed = false;
-consoleStartButton.onclick = async () => {
-  if (device === null) {
-    device = await serialLib.requestPort({});
-    transport = new Transport(device, true);
-  }
-  lblConsoleFor.style.display = "block";
-  lblConsoleBaudrate.style.display = "none";
-  consoleBaudrates.style.display = "none";
-  consoleStartButton.style.display = "none";
-  consoleStopButton.style.display = "initial";
-  resetButton.style.display = "initial";
-  programDiv.style.display = "none";
-
-  await transport.connect(parseInt(consoleBaudrates.value));
-  isConsoleClosed = false;
-
-  while (true && !isConsoleClosed) {
-    const readLoop = transport.rawRead();
-    const { value, done } = await readLoop.next();
-
-    if (done || !value) {
-      break;
-    }
-    term.write(value);
-  }
-  console.log("quitting console");
-};
-
-consoleStopButton.onclick = async () => {
-  isConsoleClosed = true;
-  if (transport) {
-    await transport.disconnect();
-    await transport.waitForUnlock(1500);
-  }
-  term.reset();
-  lblConsoleBaudrate.style.display = "initial";
-  consoleBaudrates.style.display = "initial";
-  consoleStartButton.style.display = "initial";
-  consoleStopButton.style.display = "none";
-  resetButton.style.display = "none";
-  lblConsoleFor.style.display = "none";
-  programDiv.style.display = "initial";
   cleanUp();
 };
 
@@ -359,7 +213,6 @@ programButton.onclick = async () => {
     await esploader.writeFlash(flashOptions);
   } catch (e) {
     console.error(e);
-    term.writeln(`Error: ${e.message}`);
   } finally {
     // Hide progress bars and show erase buttons
     for (let index = 1; index < table.rows.length; index++) {
@@ -368,5 +221,3 @@ programButton.onclick = async () => {
     }
   }
 };
-
-addFileButton.onclick(this);
