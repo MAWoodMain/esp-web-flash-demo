@@ -2,9 +2,6 @@ name: Build
 
 on:
   push:
-  pull_request:
-  schedule:
-    - cron: "0 0 * * *"
 
 jobs:
   build:
@@ -30,18 +27,16 @@ jobs:
         working-directory: ${{ github.event.repository.name }}
         shell: bash
         run: |
-          pwd
-          ls -la
           west build -p always -b heltec_wireless_stick_lite_v3/esp32s3/procpu app
-          ls -la
 
       - name: Check path
         shell: bash
         run: |
           pwd
+          ls -la
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           name: zephyr.bin
-          path: /home/runner/work/esp-web-flash-demo/esp-web-flash-demo/esp-web-flash-demo/build/zephyr/zephyr.bin
+          path: ${{ github.event.repository.name }}/build/zephyr/zephyr.bin
