@@ -23,7 +23,7 @@ jobs:
       - name: Setup Zephyr project
         uses: zephyrproject-rtos/action-zephyr-setup@v1
         with:
-          app-path: working-directory
+          app-path: app
           toolchains: xtensa-espressif_esp32s3_zephyr-elf
 
       - name: Build firmware
@@ -34,6 +34,11 @@ jobs:
           ls -la
           west build -p always -b heltec_wireless_stick_lite_v3/esp32s3/procpu app
           ls -la
+
+      - name: Check path
+        shell: bash
+        run: |
+          pwd
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
