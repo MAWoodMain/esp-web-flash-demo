@@ -19,7 +19,7 @@ jobs:
         with:
           node-version: 18
       - name: Wait for build
-        uses: explorium-ai/wait-github-status-action@v1.0.2
+        uses: explorium-ai/wait-github-status-action@v1.1.0
         with:
           name: Build
           token: ${{ secrets.GITHUB_TOKEN }}
