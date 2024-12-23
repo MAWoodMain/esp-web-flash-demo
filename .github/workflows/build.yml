@@ -30,7 +30,10 @@ jobs:
         working-directory: esp-web-flash-demo
         shell: bash
         run: |
+          pwd
+          ls -la
           west build -p always -b heltec_wireless_stick_lite_v3/esp32s3/procpu app
+          ls -la
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
