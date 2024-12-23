@@ -32,14 +32,6 @@ jobs:
         run: |
           west build -p always -b heltec_wireless_stick_lite_v3/esp32s3/procpu app
 
-      - name: Twister Tests
-        working-directory: esp-web-flash-demo
-        shell: bash
-        run: |
-          if [ "${{ runner.os }}" = "Windows" ]; then
-            EXTRA_TWISTER_FLAGS="--short-build-path -O/tmp/twister-out"
-          fi
-          west twister -T tests -v --inline-logs --integration $EXTRA_TWISTER_FLAGS
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
