@@ -13,7 +13,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          path: esp-web-flash-demo
+          path: working-directory
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -23,11 +23,11 @@ jobs:
       - name: Setup Zephyr project
         uses: zephyrproject-rtos/action-zephyr-setup@v1
         with:
-          app-path: esp-web-flash-demo
+          app-path: working-directory
           toolchains: xtensa-espressif_esp32s3_zephyr-elf
 
       - name: Build firmware
-        working-directory: esp-web-flash-demo
+        working-directory: working-directory
         shell: bash
         run: |
           pwd
@@ -39,4 +39,4 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           name: zephyr.bin
-          path: esp-web-flash-demo/esp-web-flash-demo/esp-web-flash-demo/build/zephyr/zephyr.bin
+          path: working-directory/esp-web-flash-demo/build/zephyr/zephyr.bin
