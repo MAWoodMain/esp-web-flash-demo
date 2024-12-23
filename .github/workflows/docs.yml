@@ -18,6 +18,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 18
+      - name: Wait for build
+        uses: explorium-ai/wait-github-status-action@v1.0.2
+        with:
+          name: Build
+          token: ${{ secrets.GITHUB_TOKEN }}
+          sha: ${{ github.event.pull_request.head.sha }} # Must
       - name: Download binary file
         uses: actions/download-artifact@v4
         with:
