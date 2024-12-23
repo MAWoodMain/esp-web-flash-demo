@@ -18,13 +18,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 18
-      - name: Install Node modules
-        run: |
-          npm install
       - name: Build example project and copy docs
         run: |
-          npm run build
-          npm run genDocs
           cd flasher
           npm install
           npm run build
