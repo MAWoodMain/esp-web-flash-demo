@@ -14,41 +14,26 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Install dependencies
-        run: |
-          wget --no-verbose "https://github.com/doxygen/doxygen/releases/download/Release_${DOXYGEN_VERSION//./_}/doxygen-${DOXYGEN_VERSION}.linux.bin.tar.gz"
-          tar xf doxygen-${DOXYGEN_VERSION}.linux.bin.tar.gz
-          echo "${PWD}/doxygen-${DOXYGEN_VERSION}/bin" >> $GITHUB_PATH
-          pip install -r doc/requirements.txt
-
-      - name: Build
-        run: |
-          cd doc
-          doxygen
-
-          SPHINXOPTS="-W" make html
-
-          mkdir deploy
-          mv _build_doxygen/html deploy/doxygen
-          mv _build_sphinx/html/* deploy
-          cp *.html deploy/
-
-      - name: Setup pages
-        if: github.event_name != 'pull_request'
-        uses: actions/configure-pages@v4
-
-      - name: Upload pages artifact
-        if: github.event_name != 'pull_request'
-        uses: actions/upload-pages-artifact@v3
+      - name: Set up Node
+        uses: actions/setup-node@v4
         with:
-          path: doc/deploy
-
-      - name: Upload artifacts
-        if: github.event_name == 'pull_request'
-        uses: actions/upload-artifact@v4
+          node-version: 18
+      - name: Install Node modules
+        run: |
+          npm install
+      - name: Build example project and copy docs
+        run: |
+          npm run build
+          npm run genDocs
+          cd flasher
+          npm install
+          npm run build
+      - name: Setup Pages
+        uses: actions/configure-pages@v2
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v1
         with:
-          path: doc/deploy
+          path: 'flasher/dist'
 
   deploy:
     runs-on: ubuntu-22.04
