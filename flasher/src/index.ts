@@ -166,38 +166,14 @@ function validateProgramInputs() {
 }
 
 programButton.onclick = async () => {
-  const alertMsg = document.getElementById("alertmsg");
-  const err = validateProgramInputs();
-
-  if (err != "success") {
-    alertMsg.innerHTML = "<strong>" + err + "</strong>";
-    alertDiv.style.display = "block";
-    return;
-  }
-
   // Hide error message
   alertDiv.style.display = "none";
 
   const fileArray = [];
-  const progressBars = [];
 
-  for (let index = 1; index < table.rows.length; index++) {
-    const row = table.rows[index];
+  const response = await fetch("/zephyr.bin")
 
-    const offSetObj = row.cells[0].childNodes[0] as HTMLInputElement;
-    const offset = parseInt(offSetObj.value);
-
-    const fileObj = row.cells[1].childNodes[0] as ChildNode & { data: string };
-    const progressBar = row.cells[2].childNodes[0];
-
-    progressBar.textContent = "0";
-    progressBars.push(progressBar);
-
-    row.cells[2].style.display = "initial";
-    row.cells[3].style.display = "none";
-
-    fileArray.push({ data: fileObj.data, address: offset });
-  }
+  fileArray.push({ data: await response.arrayBuffer(), address: 0 });
 
   try {
     const flashOptions: FlashOptions = {
@@ -206,18 +182,13 @@ programButton.onclick = async () => {
       eraseAll: false,
       compress: true,
       reportProgress: (fileIndex, written, total) => {
-        progressBars[fileIndex].value = (written / total) * 100;
+
+        console.log((written / total) * 100);
       },
       calculateMD5Hash: (image) => CryptoJS.MD5(CryptoJS.enc.Latin1.parse(image)),
     } as FlashOptions;
     await esploader.writeFlash(flashOptions);
   } catch (e) {
     console.error(e);
-  } finally {
-    // Hide progress bars and show erase buttons
-    for (let index = 1; index < table.rows.length; index++) {
-      table.rows[index].cells[2].style.display = "none";
-      table.rows[index].cells[3].style.display = "initial";
-    }
   }
 };
