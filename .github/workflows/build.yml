@@ -28,7 +28,7 @@ jobs:
         uses: zephyrproject-rtos/action-zephyr-setup@v1
         with:
           app-path: esp-web-flash-demo
-          toolchains: arm-zephyr-eabi
+          toolchains: xtensa-espressif_esp32s3_zephyr-elf
 
       - name: Build firmware
         working-directory: esp-web-flash-demo
