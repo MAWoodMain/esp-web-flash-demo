@@ -44,4 +44,4 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           name: zephyr.bin
-          path: ${{ github.event.repository.name }}/build/zephyr/zephyr.bin
+          path: /home/runner/work/esp-web-flash-demo/esp-web-flash-demo/esp-web-flash-demo/build/zephyr/zephyr.bin
