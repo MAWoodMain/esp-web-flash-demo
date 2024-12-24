@@ -5,7 +5,8 @@
   "source": "src/index.html",
   "scripts": {
     "dev": "npm run clean && parcel src/index.html",
-    "build": "npm run clean && parcel build src/index.html --no-optimize --public-url ./",
+    "build": "npm run clean && parcel build src/index.html --no-optimize --public-url ./  && cp ../build/zephyr/zephyr.bin ./dist/",
+    "build_windows": "npm run clean && parcel build src/index.html --no-optimize --public-url ./  && copy ..\\build\\zephyr\\zephyr.bin .\\dist",
     "clean": "rimraf dist .parcel-cache",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

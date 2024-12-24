@@ -89,6 +89,33 @@ disconnectButton.onclick = async () => {
   alertDiv.style.display = "none";
   cleanUp();
 };
+async function parse(file) {
+  const reader = new FileReader();
+  reader.readAsText(file, 'utf-8');
+  return await new Promise((resolve, reject) => {
+    reader.onload = function(event) {
+      resolve(reader.result)
+    }
+  })
+}
+
+async function urlToBstr(url: string)
+{
+  const resp = await fetch(url);
+  if (!resp.ok) {
+    throw new Error(
+        `Downlading firmware ${url} failed: ${resp.status}`,
+    );
+  }
+
+  const reader = new FileReader();
+  const blob = await resp.blob();
+
+  return new Promise<string>((resolve) => {
+    reader.addEventListener("load", () => resolve(reader.result as string));
+    reader.readAsBinaryString(blob);
+  });
+}
 
 programButton.onclick = async () => {
   // Hide error message
@@ -96,9 +123,10 @@ programButton.onclick = async () => {
 
   const fileArray = [];
 
-  const response = await fetch("zephyr.bin")
-
-  fileArray.push({ data: await response.blob(), address: 0 });
+  const bstr = await urlToBstr("zephyr.bin")
+  console.log(bstr.length)
+  fileArray.push({ data: bstr, address: 0 });
+  console.log(fileArray)
 
   try {
     const flashOptions: FlashOptions = {

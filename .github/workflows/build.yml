@@ -44,8 +44,7 @@ jobs:
           cd flasher
           npm install
           npm run build
-          cp ../build/zephyr/zephyr.bin ./dist/
-      - name: Setup Pages
+`      - name: Setup Pages
         uses: actions/configure-pages@v4
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
