@@ -6,6 +6,7 @@ on:
 env:
   BOARD: heltec_wireless_stick_lite_v3/esp32s3/procpu
   TOOLCHAIN: xtensa-espressif_esp32s3_zephyr-elf
+
 jobs:
   build:
     runs-on: ubuntu-22.04
@@ -32,7 +33,7 @@ jobs:
         run: |
           west build -p always -b $BOARD app
 
-      - name: Upload artifact
+      - name: Upload firmware binary
         uses: actions/upload-artifact@v4
         with:
           name: zephyr.bin
@@ -52,13 +53,13 @@ jobs:
         with:
           path: ${{ github.event.repository.name }}
 
-      - name: Download math result for job 1
+      - name: Download firmware binary
         uses: actions/download-artifact@v4
         with:
           name: zephyr.bin
           path: ${{ github.event.repository.name }}/build/zephyr
 
-      - name: Build example project and copy docs
+      - name: Generate flasher website
         working-directory: ${{ github.event.repository.name }}
         run: |
           cd flasher
@@ -67,8 +68,8 @@ jobs:
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
-      - name: Upload artifact
 
+      - name: Upload pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: '${{ github.event.repository.name }}/flasher/dist'
