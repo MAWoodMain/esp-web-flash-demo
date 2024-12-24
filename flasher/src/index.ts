@@ -96,7 +96,7 @@ programButton.onclick = async () => {
 
   const fileArray = [];
 
-  const response = await fetch("/zephyr.bin")
+  const response = await fetch("zephyr.bin")
 
   fileArray.push({ data: await response.arrayBuffer(), address: 0 });
 
