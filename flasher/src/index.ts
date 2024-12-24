@@ -1,10 +1,8 @@
 const connectButton = document.getElementById("connectButton") as HTMLButtonElement;
 const disconnectButton = document.getElementById("disconnectButton") as HTMLButtonElement;
-const resetButton = document.getElementById("resetButton") as HTMLButtonElement;
 const eraseButton = document.getElementById("eraseButton") as HTMLButtonElement;
 const programButton = document.getElementById("programButton");
 const lblConnTo = document.getElementById("lblConnTo");
-const table = document.getElementById("fileTable") as HTMLTableElement;
 const alertDiv = document.getElementById("alertDiv");
 
 const debugLogging = document.getElementById("debugLogging") as HTMLInputElement;
@@ -23,7 +21,6 @@ let esploader: ESPLoader;
 
 disconnectButton.style.display = "none";
 eraseButton.style.display = "none";
-resetButton.style.display = "none";
 
 /**
  * The built in Event object.
@@ -31,23 +28,6 @@ resetButton.style.display = "none";
  * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Event}
  */
 
-/**
- * File reader handler to read given local file.
- * @param {Event} evt File Select event
- */
-function handleFileSelect(evt) {
-  const file = evt.target.files[0];
-
-  if (!file) return;
-
-  const reader = new FileReader();
-
-  reader.onload = (ev: ProgressEvent<FileReader>) => {
-    evt.target.data = ev.target.result;
-  };
-
-  reader.readAsBinaryString(file);
-}
 
 connectButton.onclick = async () => {
   if (device === null) {
@@ -79,14 +59,6 @@ connectButton.onclick = async () => {
   eraseButton.style.display = "initial";
 };
 
-resetButton.onclick = async () => {
-  if (transport) {
-    await transport.setDTR(false);
-    await new Promise((resolve) => setTimeout(resolve, 100));
-    await transport.setDTR(true);
-  }
-};
-
 eraseButton.onclick = async () => {
   eraseButton.disabled = true;
   try {
@@ -97,21 +69,6 @@ eraseButton.onclick = async () => {
     eraseButton.disabled = false;
   }
 };
-
-/**
- * The built in HTMLTableRowElement object.
- * @external HTMLTableRowElement
- * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLTableRowElement}
- */
-
-/**
- * Remove file row from HTML Table
- * @param {HTMLTableRowElement} row Table row element to remove
- */
-function removeRow(row: HTMLTableRowElement) {
-  const rowIndex = Array.from(table.rows).indexOf(row);
-  table.deleteRow(rowIndex);
-}
 
 /**
  * Clean devices variables on chip disconnect. Remove stale references if any.
@@ -132,38 +89,6 @@ disconnectButton.onclick = async () => {
   alertDiv.style.display = "none";
   cleanUp();
 };
-
-/**
- * Validate the provided files images and offset to see if they're valid.
- * @returns {string} Program input validation result
- */
-function validateProgramInputs() {
-  const offsetArr = [];
-  const rowCount = table.rows.length;
-  let row;
-  let offset = 0;
-  let fileData = null;
-
-  // check for mandatory fields
-  for (let index = 1; index < rowCount; index++) {
-    row = table.rows[index];
-
-    //offset fields checks
-    const offSetObj = row.cells[0].childNodes[0];
-    offset = parseInt(offSetObj.value);
-
-    // Non-numeric or blank offset
-    if (Number.isNaN(offset)) return "Offset field in row " + index + " is not a valid address!";
-    // Repeated offset used
-    else if (offsetArr.includes(offset)) return "Offset field in row " + index + " is already in use!";
-    else offsetArr.push(offset);
-
-    const fileObj = row.cells[1].childNodes[0];
-    fileData = fileObj.data;
-    if (fileData == null) return "No file selected for row " + index + "!";
-  }
-  return "success";
-}
 
 programButton.onclick = async () => {
   // Hide error message
