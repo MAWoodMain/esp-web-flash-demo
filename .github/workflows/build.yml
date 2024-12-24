@@ -3,6 +3,9 @@ name: Build
 on:
   push:
 
+env:
+  BOARD: heltec_wireless_stick_lite_v3/esp32s3/procpu
+  TOOLCHAIN: xtensa-espressif_esp32s3_zephyr-elf
 jobs:
   build:
     runs-on: ubuntu-22.04
@@ -21,13 +24,13 @@ jobs:
         uses: zephyrproject-rtos/action-zephyr-setup@v1
         with:
           app-path: ${{ github.event.repository.name }}
-          toolchains: xtensa-espressif_esp32s3_zephyr-elf
+          toolchains: $TOOLCHAIN
 
       - name: Build firmware
         working-directory: ${{ github.event.repository.name }}
         shell: bash
         run: |
-          west build -p always -b heltec_wireless_stick_lite_v3/esp32s3/procpu app
+          west build -p always -b $BOARD app
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
