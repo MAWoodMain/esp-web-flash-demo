@@ -34,27 +34,45 @@ jobs:
         with:
           name: zephyr.bin
           path: ${{ github.event.repository.name }}/build/zephyr/zephyr.bin
+
+  flasher:
+    runs-on: ubuntu-22.04
+    needs: build
+    steps:
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version: 18
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: ${{ github.event.repository.name }}
+
+      - name: Download math result for job 1
+        uses: actions/download-artifact@v4
+        with:
+          name: zephyr.bin
+          path: ${{ github.event.repository.name }}/build/zephyr
+
       - name: Build example project and copy docs
         working-directory: ${{ github.event.repository.name }}
         run: |
           cd flasher
           npm install
           npm run build
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
       - name: Upload artifact
+
         uses: actions/upload-pages-artifact@v3
         with:
           path: '${{ github.event.repository.name }}/flasher/dist'
 
-
   deploy:
     runs-on: ubuntu-22.04
-    needs: build
+    needs: flasher
     if: github.event_name != 'pull_request'
     permissions:
       pages: write
