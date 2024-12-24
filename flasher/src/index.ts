@@ -98,7 +98,7 @@ programButton.onclick = async () => {
 
   const response = await fetch("zephyr.bin")
 
-  fileArray.push({ data: await response.arrayBuffer(), address: 0 });
+  fileArray.push({ data: await response.blob(), address: 0 });
 
   try {
     const flashOptions: FlashOptions = {
