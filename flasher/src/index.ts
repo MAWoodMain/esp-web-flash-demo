@@ -7,8 +7,6 @@ const alertDiv = document.getElementById("alertDiv");
 const progressBar = document.getElementById("progressBar");
 const progressBarDiv = document.getElementById("progressBarDiv");
 
-const debugLogging = document.getElementById("debugLogging") as HTMLInputElement;
-
 import { ESPLoader, FlashOptions, LoaderOptions, Transport } from "esptool-js";
 import { serial } from "web-serial-polyfill";
 
