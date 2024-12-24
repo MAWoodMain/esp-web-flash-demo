@@ -4,6 +4,8 @@ const eraseButton = document.getElementById("eraseButton") as HTMLButtonElement;
 const programButton = document.getElementById("programButton");
 const lblConnTo = document.getElementById("lblConnTo");
 const alertDiv = document.getElementById("alertDiv");
+const progressBar = document.getElementById("progressBar");
+const progressBarDiv = document.getElementById("progressBarDiv");
 
 const debugLogging = document.getElementById("debugLogging") as HTMLInputElement;
 
@@ -21,6 +23,8 @@ let esploader: ESPLoader;
 
 disconnectButton.style.display = "none";
 eraseButton.style.display = "none";
+programButton.style.display = "none";
+progressBarDiv.style.display = "none";
 
 /**
  * The built in Event object.
@@ -57,6 +61,7 @@ connectButton.onclick = async () => {
   connectButton.style.display = "none";
   disconnectButton.style.display = "initial";
   eraseButton.style.display = "initial";
+  programButton.style.display = "initial";
 };
 
 eraseButton.onclick = async () => {
@@ -87,6 +92,8 @@ disconnectButton.onclick = async () => {
   eraseButton.style.display = "none";
   lblConnTo.style.display = "none";
   alertDiv.style.display = "none";
+  programButton.style.display = "none";
+  progressBarDiv.style.display = "none";
   cleanUp();
 };
 async function parse(file) {
@@ -127,6 +134,10 @@ programButton.onclick = async () => {
   console.log(bstr.length)
   fileArray.push({ data: bstr, address: 0 });
   console.log(fileArray)
+  progressBar.classList.remove("progress-bar-danger");
+  progressBar.classList.remove("progress-bar-success");
+  progressBarDiv.style.display = null;
+  progressBar.textContent = "Flashing..."
 
   try {
     const flashOptions: FlashOptions = {
@@ -135,13 +146,16 @@ programButton.onclick = async () => {
       eraseAll: false,
       compress: true,
       reportProgress: (fileIndex, written, total) => {
-
-        console.log((written / total) * 100);
+        progressBar.style.width = String((written / total) * 100) + '%';
       },
       calculateMD5Hash: (image) => CryptoJS.MD5(CryptoJS.enc.Latin1.parse(image)),
     } as FlashOptions;
     await esploader.writeFlash(flashOptions);
+    progressBar.classList.add("progress-bar-success");
+    progressBar.textContent = "Flashing Completed Successfully"
   } catch (e) {
+    progressBar.classList.add("progress-bar-danger");
+    progressBar.textContent = "Flashing Failed"
     console.error(e);
   }
 };
