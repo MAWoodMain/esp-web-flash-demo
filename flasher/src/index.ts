@@ -39,7 +39,7 @@ connectButton.onclick = async () => {
     const flashOptions = {
       transport,
       baudrate: 115200, /* todo check */
-      debugLogging: debugLogging.checked,
+      debugLogging: false,
     } as LoaderOptions;
     esploader = new ESPLoader(flashOptions);
 
